@@ -1,0 +1,424 @@
+<DOCTYPE !HTML>
+	<html>
+
+	<head>
+		<title>Terceiro Jogo</title>
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+				margin: 0px;
+				border: 0;
+				overflow: hidden;  /* Desabilita Barra de Rolagem */
+				display: block;    /* Não permite conteudo flutuar nos lados */
+			}
+
+		   #canvas {
+/*		   	    background-image: url('img/fundo-do-mar.jpg');
+		   	    background-size: 100% 100%;
+		   	    background-repeat: no-repeat; */
+		   		background-color: black; 
+		   }
+
+		   #pacman {
+		   		width: 80px;
+		   		height: 60px;
+		   		display: none;
+		   		opacity: 0.5;
+		   		filter: alpha(opacity=50);
+		   }
+
+   		  
+		   #cronometro {
+		   		display: none;
+		   }
+
+		</style>
+	</head>
+
+	<body onload="inicializar()" id="fundo">
+
+		<img src="img/pacman.gif" id="pacman" />
+		<img src="img/fantasma1.gif" id="fantasma" />
+		<span id="cronometro" style="color: red; font-size: 30px;"></span>
+
+		<canvas id="canvas" style='position:absolute; left:0px; top:0px;'>
+			Navegador não suporta HTML5
+		</canvas>
+		<script type="text/javascript">
+	
+			// Declaração de variaveis
+			var barraAltura,
+				barraLargura,
+				jogadorRaio,
+				jogadorPosicaoX,
+				jogadorPosicaoY,
+				jogadorSentido,
+				vidasJogador,
+				velocidadeJogador,
+				pontosJogador,
+				pontosJogadorLimite,
+				jogadorfim,
+				jogadorpausa,
+				intervalo,
+				tempoJogo,
+				tempochefao;
+
+	
+			// Declaração de Matriz
+			var diametros = new Array(
+				{ 'diametro': 10, 'pontos': 1, 'cor': 'rgba(0,127,255,0.3)', 'bolha': 2 },
+				{ 'diametro': 15, 'pontos': 2, 'cor': 'rgba(92,51,23,0.3)', 'bolha': 3 },
+				{ 'diametro': 20, 'pontos': 3, 'cor': 'rgba(82,127,118,0.3)', 'bolha': 4 },
+
+			);
+
+			function inicializar() {
+				barraAltura = 110;
+				barraLargura = 130;
+				tempoJogo = 0;
+				tempochefao = 0;
+				velocidadeJogador = 20;
+				jogadorpausa = false;
+				canvas = document.getElementById("canvas");
+				context = canvas.getContext("2d");
+				jogadorfim = false;
+				jogadorRaio = 50;
+				first = new fantasma();
+				fantasmas = new Array(first);
+
+				document.addEventListener('keydown', keyDown);
+				window.addEventListener('resize', resizeCanvas, false);
+				cronometro(tempoJogo);
+				resizeCanvas();
+			
+				jogadorPosicaoX = canvas.width / 2;
+				jogadorPosicaoY = canvas.height / 2;
+				jogadorSentido = 1;
+
+				intervalo = setInterval(gameLoop, 30);
+				setInterval(spawnFantasma, 3000);
+			}
+
+
+			/* Nova função para RESIZE */
+			function resizeCanvas() {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				gameLoop();
+			}
+
+			function keyDown(e) {
+				if (e.keyCode == 37)  // Seta para a Esquerda
+				{
+					if (jogadorPosicaoX > 0) {
+						jogadorPosicaoX -= velocidadeJogador;
+					}
+					jogadorSentido = 4;
+				}
+
+				if (e.keyCode == 38)  // Seta para a Cima
+				{
+					if (jogadorPosicaoY > 0) {
+						jogadorPosicaoY -= velocidadeJogador;
+					}
+					jogadorSentido = 1;
+				}
+
+				if (e.keyCode == 39)  // Seta para a Direita
+				{
+					if (jogadorPosicaoX < (canvas.width - jogadorRaio)) {
+						jogadorPosicaoX += velocidadeJogador;
+					}
+					jogadorSentido = 2;
+				}
+
+
+
+				if (e.keyCode == 40)  // Seta para a baixo
+				{
+
+					if (jogadorPosicaoY < (canvas.height - jogadorRaio)) {
+						jogadorPosicaoY += velocidadeJogador;
+					}
+					jogadorSentido = 3;
+				}
+
+
+				if (e.keyCode == 81)  // Q (Quiet)
+				{
+					jogadorfim = true;
+				}
+
+				if (e.keyCode == 80)  // P (Pause)
+				{
+					if (jogadorpausa) {
+						jogadorpausa = false;
+						// para de rodar o intervalo
+						intervalo = setInterval(gameLoop, 30);
+						cronometro(document.getElementById("cronometro").innerHTML);
+					} else {
+						jogadorpausa = true;
+						gameLoop();
+
+						// para de rodar o intervalo
+						clearInterval(intervalo);
+						clearTimeout(timerId);
+					}
+				}
+
+
+			}
+
+
+
+			function fantasma() {
+				//var index = Math.round(Math.random() * (6 - 1) + 1) - 1;
+
+				this.sentido = Math.round(Math.random() * (4 - 1));
+				this.fantasmaWidth = 50;
+				this.fantasmaHeight = 50;
+				//1 TOP
+				//2 Direita
+				//3 Baixo
+				//4 Esqueda
+				if (this.sentido == 1) {
+
+					this.fantasmaPosX = Math.random() * canvas.width;
+					this.fantasmaPosY = canvas.height + 70;
+
+				} else if (this.sentido == 2) {
+
+					this.fantasmaPosX = -70;
+					this.fantasmaPosY = Math.random() * canvas.height;
+
+				} else if (this.sentido == 3) {
+
+					this.fantasmaPosX = Math.random() * canvas.width;
+					this.fantasmaPosY = -70;
+
+				} else if (this.sentido == 4) {
+					this.fantasmaPosX = canvas.width - 70;
+					this.fantasmaPosY = Math.random() * canvas.height;
+				}
+
+				this.velocidadefantasma = Math.round(Math.random() * (10 - 6)) + 6;
+				this.colisao = false;
+			}
+
+			function spawnFantasma() {
+				
+				if((fantasmas.length % 10) == 0){
+					console.log("entrou "+fantasmas.length);
+					var chefao = new fantasma();
+					chefao.fantasmaHeight = 250;
+					chefao.fantasmaWidth = 250;
+
+					fantasmas.push(chefao);
+				}
+
+					fantasmas.push(new fantasma());
+				
+			}
+
+			function gameLoop() {
+				//Limpa Tela
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+
+
+				// Checar fantasmas
+				if (fantasmas.length <= 0) {
+					fantasmas.push(new fantasma());
+				}
+
+
+				//
+
+
+				// fantasmas				
+				fantasmas.forEach(function (f, index) {
+					//console.log("X:"+f.fantasmaPosX+"  Y:"+f.fantasmaPosX);
+					var fantasma = document.getElementById("fantasma");
+					context.drawImage(fantasma, f.fantasmaPosX, f.fantasmaPosY, f.fantasmaWidth, f.fantasmaHeight);
+					//1 TOP
+					//2 DIREITA
+					//3 BAIXO
+					//4 ESQUERDA
+
+					if (f.sentido == 1) {
+
+						f.fantasmaPosY -= f.velocidadefantasma;
+
+						if (f.fantasmaPosY < -70) {
+							f.sentido = 3;
+						}
+
+					} else if (f.sentido == 2) {
+
+						f.fantasmaPosX += f.velocidadefantasma;
+						if (f.fantasmaPosX > canvas.width + 70) {
+							f.sentido = 4;
+						}
+
+					} else if (f.sentido == 3) {
+
+						f.fantasmaPosY += f.velocidadefantasma;
+
+						if (f.fantasmaPosY > canvas.height + 70) {
+							f.sentido = 1;
+						}
+					} else if (f.sentido == 4) {
+
+
+						f.fantasmaPosX -= f.velocidadefantasma;
+
+						if (f.fantasmaPosX < - 70) {
+							f.sentido = 2;
+						}
+
+					}
+
+					if (
+						(f.fantasmaPosX > jogadorPosicaoX && f.fantasmaPosX < jogadorPosicaoX + 50)
+						&& f.fantasmaPosY >= jogadorPosicaoY - 50 && f.fantasmaPosY < jogadorPosicaoY
+					) {
+						game_over();
+					}
+
+
+				});
+				/*
+				if (f.fantasmaPosY >= 50 && fantasmas.length <= 2) {
+					fantasmas.push(new fantasma());
+				}
+
+				
+									if (f.fantasmaPosY <= canvas.height) {
+										f.fantasmaPosY += f.velocidadefantasma;
+									}
+									else {
+				
+									}
+				
+									// Checar Colisão
+									if ((f.fantasmaPosX > jogadorPosicaoX && f.fantasmaPosX < jogadorPosicaoX + barraLargura) && f.fantasmaPosY >= canvas.height - barraAltura && f.colisao == false) {
+										pontosJogador += f.pontos;
+										f.colisao = true;
+									}
+				
+									if (jogadorfim) {
+										game_over();
+										exit;
+									}
+				*/
+
+
+				// Desenha um retangulo no topo para abrigar as informações de Tempo, Pontuação, Jogo pausado, resolução e nome do jogo
+				context.fillStyle = 'rgba(0,0,125,0.5)';
+				context.fillRect(0, 0, canvas.width, 70);
+
+				// Se jogo pausado				
+				if (jogadorpausa) {
+					context.font = "12pt bold Tahoma";
+					context.fillStyle = 'rgb(255,255,255)';
+					context.fillText('JOGO PAUSADO', 20, 30);
+				}
+
+				// Nome do Jogo
+				context.font = "50pt Brush Script Std"
+				context.fillStyle = "white";
+				var Umterco = canvas.width / 3;
+				context.fillText('PacMan Survive', Umterco, 50);
+
+
+				// Escreve Tempo restante
+				context.font = "32pt Tahoma";
+				context.fillStyle = "white";
+				context.fillText('Pontos: ' + document.getElementById("cronometro").innerHTML, canvas.width - 250, 50);
+
+				//Mostra carangueijo
+				var pacman = document.getElementById("pacman");
+				context.drawImage(pacman, jogadorPosicaoX, jogadorPosicaoY, 50, 50);
+
+				if (jogadorSentido == 1) {
+					if (jogadorPosicaoY > 0) {
+						jogadorPosicaoY -= velocidadeJogador;
+					}
+
+				} 
+
+				 if (jogadorSentido == 2) {
+
+					if (jogadorPosicaoX  < canvas.width) {
+						jogadorPosicaoX += velocidadeJogador;
+					}
+
+				}  
+				if (jogadorSentido == 3) {
+					if ( jogadorPosicaoY  < canvas.height) {
+						jogadorPosicaoY += velocidadeJogador;
+					}
+				} 
+				 if (jogadorSentido == 4) {
+					if (jogadorPosicaoX  > 0) {
+						jogadorPosicaoX -= velocidadeJogador;
+					}
+				}
+
+			}
+
+			// Função para mostrar mensagem de Fim de Jogo
+			function game_over() {
+				// Limpa Tela
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+				// Desenha um retangulo
+				context.fillStyle = 'rgba(0,0,125,0.5)';
+				context.fillRect((canvas.width - 90) / 2 - 198, (canvas.height / 2) - 211, 518, 298);
+				retanguloBordaRedonda(context, (canvas.width - 90) / 2 - 200, (canvas.height / 2) - 212, 520, 300, 8);
+
+				// Desenha o carangueijo
+				context.drawImage(pacman, (canvas.width - 90) / 2, (canvas.height / 2) - 180, 125, 110);
+
+				// Escreve mensagem de fim de jogo
+				context.font = "32pt Tahoma";
+				context.fillStyle = 'rgb(255,255,255)';
+				context.fillText("FIM DE JOGO", (canvas.width - 250) / 2, (canvas.height - 32) / 2);
+				context.fillText("TOTAL DE PONTOS = " + pontosJogador, (canvas.width - 430) / 2, (canvas.height - 32) / 2 + 50);
+
+				// para de rodar o intervalo
+				clearInterval(intervalo);
+				clearTimeout(timerId);
+			}
+
+			// Cronometro para o Tempo
+			function cronometro(segundos) {
+				document.getElementById("cronometro").innerHTML = segundos;
+				timerId = setTimeout("cronometro(" + (segundos + 1) + ")", 1000); // A cada 1 seg uma chamada recursiva é chamada, atualizando o valor do cronomêtro
+				if (segundos == -1) {
+					clearTimeout(timerId); // Parar o cronometro
+					game_over();
+					document.getElementById("cronometro").innerHTML = 0;
+					return false;
+				}
+			}
+
+			// Desenha um retangulo com bordas arredondadas
+			function retanguloBordaRedonda(ctx, x, y, width, height, radius) {
+				ctx.beginPath();
+				ctx.moveTo(x, y + radius);
+				ctx.lineTo(x, y + height - radius);
+				ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+				ctx.lineTo(x + width - radius, y + height);
+				ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+				ctx.lineTo(x + width, y + radius);
+				ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+				ctx.lineTo(x + radius, y);
+				ctx.quadraticCurveTo(x, y, x, y + radius);
+				ctx.stroke();
+			}
+		</script>
+	</body>
+
+	</html>
