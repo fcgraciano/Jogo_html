@@ -1,0 +1,7 @@
+<body onload="inicializar()">
+    <img src="img/pacman.png" id="jogador"  />
+    <img src="img/fantasma3.gif" id="inimigo"  />
+    <span id="cronometro" style="color: red; font-size: 30px;"></span>
+    <canvas id="canvas">
+        Navegador não suporta HTML5
+    </canvas>

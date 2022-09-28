@@ -1,0 +1,46 @@
+var player =
+        {
+            //Atributos (caracteristicas)
+            elemento: document.getElementById("jogador"),
+            velocidade: 15,
+            direcao: 0, // Cima, baixo, Esquerda, Direita,
+            Y: window.innerHeight / 2,
+            X: window.innerWidth  / 2,
+            //Metodos ( Ações )
+            setMovimento: function (e) {
+               
+                if (e.keyCode == 37)  // Seta para a Esquerda
+                {
+                    if (player.X >=0) {
+                        player.X -= player.velocidade;
+                    }
+                    player.direcao = 4;
+                }
+
+                if (e.keyCode == 38)  // Seta para a Cima
+                {
+                    if (player.Y > 0) {
+                        player.Y -= player.velocidade;
+                    }
+                    player.direcao = 1;
+                }
+
+                if (e.keyCode == 39)  // Seta para a Direita
+                {
+                    if (player.X < (canvas.width - player.elemento.width)) {
+                        player.X += player.velocidade;
+                    }
+                    player.direcao = 2;
+                }
+
+                if (e.keyCode == 40)  // Seta para a baixo
+                {
+
+                    if (player.Y < (canvas.height - player.elemento.height)) {
+                        player.Y += player.velocidade;
+                    }
+                    player.direcao = 3;
+                }
+            }
+
+        }

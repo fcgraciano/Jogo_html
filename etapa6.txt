@@ -1,0 +1,14 @@
+ function inicializar() {
+            canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+            cronometro(tempoJogo);
+            document.addEventListener('keydown', player.setMovimento);
+           
+
+            context.drawImage(player.elemento, player.X+player.Raio, player.Y+player.Raio)
+           
+
+
+            LoopGame = setInterval(gameLoop, 30);
+            setInterval(spawnInimigos, 3000);
+        }

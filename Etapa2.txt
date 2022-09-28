@@ -1,0 +1,22 @@
+  <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            border: 0;
+            overflow: hidden;
+            /* Desabilita Barra de Rolagem */
+            display: block;
+            /* Não permite conteudo flutuar nos lados */
+        }
+
+        #canvas {
+            background-color: black;
+            position:absolute;
+            left:0px; 
+            top:0px;
+        }
+
+        
+    </style>

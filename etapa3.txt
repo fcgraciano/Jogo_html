@@ -1,0 +1,6 @@
+ var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        var tempoJogo = 0;
+        var pontosJogador = 0;
+        var timerId = 0;
+        var LoopGame = 0;

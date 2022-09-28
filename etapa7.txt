@@ -1,0 +1,51 @@
+function gameLoop() {
+            //Limpa a tela para que tudo seja desenhado novamente nas posições
+            context.clearRect(0, 0, canvas.width, canvas.height);
+          
+            context.drawImage(player.elemento, player.X, player.Y)
+          
+            
+            //Primeiro Verifico se existem inimigos na Listainimigos
+            if (ListaInimigos.length <= 0) {
+                ListaInimigos.push(new Inimigo());
+			}
+           
+            DesenharInimigos();
+            
+            //Movimentação do Player
+           
+            if (player.direcao == 1) {
+                if (player.Y > 0) {
+                    player.Y -= player.velocidade;
+                }
+            }
+            if (player.direcao == 2) {
+
+                if (player.X < canvas.width - player.elemento.width) {
+                    player.X += player.velocidade;
+                }
+
+            }
+            if (player.direcao == 3) {
+                if (player.Y < canvas.height-player.elemento.height) {
+                    player.Y += player.velocidade;
+                }
+            }
+            if (player.direcao == 4) {
+                if (player.X > 0) {
+                    player.X -= player.velocidade;
+                }
+            }
+          
+            context.fillStyle = 'rgba(0,0,125,0.5)';
+				context.fillRect(0, 0, canvas.width, 70);
+                context.font = "50pt Brush Script Std"
+				context.fillStyle = "white";
+				var Umterco = canvas.width / 3;
+				context.fillText('PacMan Survive', Umterco, 50);
+                context.font = "32pt Tahoma";
+				context.fillStyle = "white";
+				context.fillText('Pontos: ' + document.getElementById("cronometro").innerHTML, canvas.width - 250, 50);
+   
+
+        }

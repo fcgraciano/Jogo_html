@@ -1,0 +1,61 @@
+  function game_over() {
+				// Limpa Tela
+				context.clearRect(0, 0, canvas.width, canvas.height);
+               
+				// Desenha um retangulo
+				context.fillStyle = 'rgba(0,0,125,0.5)';
+				context.fillRect((canvas.width - 90) / 2 - 198, (canvas.height / 2) - 211, 518, 298);
+				retanguloBordaRedonda(context, (canvas.width - 90) / 2 - 200, (canvas.height / 2) - 212, 520, 300, 8);
+
+				
+				context.drawImage(player.elemento, (canvas.width - 90) / 2, (canvas.height / 2) - 180, 125, 110);
+
+				// Escreve mensagem de fim de jogo
+				context.font = "32pt Tahoma";
+				context.fillStyle = 'rgb(255,255,255)';
+				context.fillText("FIM DE JOGO", (canvas.width - 250) / 2, (canvas.height - 32) / 2);
+                document.getElementById("cronometro").innerHTML = pontosJogador;
+				context.fillText("TOTAL DE PONTOS = " + pontosJogador, (canvas.width - 430) / 2, (canvas.height - 32) / 2 + 50);
+
+				clearTimeout(LoopGame)			;
+				clearTimeout(timerId);
+			}
+            function retanguloBordaRedonda(ctx, x, y, width, height, radius) {
+				ctx.beginPath();
+				ctx.moveTo(x, y + radius);
+				ctx.lineTo(x, y + height - radius);
+				ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+				ctx.lineTo(x + width - radius, y + height);
+				ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+				ctx.lineTo(x + width, y + radius);
+				ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+				ctx.lineTo(x + radius, y);
+				ctx.quadraticCurveTo(x, y, x, y + radius);
+				ctx.stroke();
+			}
+
+            function cronometro(segundos) {
+				document.getElementById("cronometro").innerHTML = segundos;
+                pontosJogador ++;
+				timerId = setTimeout("cronometro(" + (parseInt(segundos) + 1) + ")", 1000); // A cada 1 seg uma chamada recursiva é chamada, atualizando o valor do cronomêtro
+				if (segundos == -1) {
+					clearTimeout(timerId); // Parar o cronometro
+					game_over();
+					document.getElementById("cronometro").innerHTML = 0;
+					return false;
+				}
+			}
+
+            function retanguloBordaRedonda(ctx, x, y, width, height, radius) {
+				ctx.beginPath();
+				ctx.moveTo(x, y + radius);
+				ctx.lineTo(x, y + height - radius);
+				ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+				ctx.lineTo(x + width - radius, y + height);
+				ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+				ctx.lineTo(x + width, y + radius);
+				ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+				ctx.lineTo(x + radius, y);
+				ctx.quadraticCurveTo(x, y, x, y + radius);
+				ctx.stroke();
+			}
